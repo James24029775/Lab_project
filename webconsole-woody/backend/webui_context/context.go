@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/free5gc/openapi/models"
-	timedecode "github.com/free5gc/util/mapstruct"
-	"github.com/free5gc/util/mongoapi"
-	"github.com/free5gc/webconsole/backend/logger"
+	// timedecode "github.com/free5gc/util/mapstruct"
+	// "github.com/free5gc/util/mongoapi"
+	// "github.com/free5gc/webconsole/backend/logger"
 )
 
 var webuiContext = WEBUIContext{}
@@ -26,18 +26,18 @@ func init() {
 }
 
 func (context *WEBUIContext) UpdateNfProfiles() {
-	nfProfilesRaw, err := mongoapi.RestfulAPIGetMany("NfProfile", nil)
-	if err != nil {
-		logger.ContextLog.Error(err)
-		return
-	}
-	var nfProfiles []models.NfProfile
-	if err := timedecode.Decode(nfProfilesRaw, &nfProfiles); err != nil {
-		logger.ContextLog.Error(err)
-		return
-	}
+	// nfProfilesRaw, err := mongoapi.RestfulAPIGetMany("NfProfile", nil)
+	// if err != nil {
+	// 	logger.ContextLog.Error(err)
+	// 	return
+	// }
+	// var nfProfiles []models.NfProfile
+	// if err := timedecode.Decode(nfProfilesRaw, &nfProfiles); err != nil {
+	// 	logger.ContextLog.Error(err)
+	// 	return
+	// }
 
-	context.NFProfiles = nfProfiles
+	// context.NFProfiles = nfProfiles
 
 	for _, nfProfile := range context.NFProfiles {
 		if nfProfile.NfServices == nil || context.NfProfileAlreadyExists(nfProfile) {

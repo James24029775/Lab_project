@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 
-	"github.com/free5gc/util/mongoapi"
+	// "github.com/free5gc/util/mongoapi"
 	"github.com/free5gc/webconsole/backend/WebUI"
 	"github.com/free5gc/webconsole/backend/factory"
 	"github.com/free5gc/webconsole/backend/logger"
@@ -122,13 +122,13 @@ func (webui *WEBUI) FilterCli(c *cli.Context) (args []string) {
 
 func (webui *WEBUI) Start() {
 	// get config file info from WebUIConfig
-	mongodb := factory.WebUIConfig.Configuration.Mongodb
+	// mongodb := factory.WebUIConfig.Configuration.Mongodb
 
 	// Connect to MongoDB
-	if err := mongoapi.SetMongoDB(mongodb.Name, mongodb.Url); err != nil {
-		initLog.Errorf("Server start err: %+v", err)
-		return
-	}
+	// if err := mongoapi.SetMongoDB(mongodb.Name, mongodb.Url); err != nil {
+	// 	initLog.Errorf("Server start err: %+v", err)
+	// 	return
+	// }
 
 	initLog.Infoln("Server started")
 

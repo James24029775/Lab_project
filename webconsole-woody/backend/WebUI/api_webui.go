@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	// "strconv"
 	"strings"
 	"time"
 
@@ -33,9 +34,16 @@ const (
 	flowRuleDataColl = "policyData.ues.flowRule"
 	userDataColl     = "userData"
 	tenantDataColl   = "tenantData"
+	quotaDataColl    = "quotaData"
 )
 
 var httpsClient *http.Client
+// var SupiRatingGroupIDMap map[string]uint32
+// var RegisteredDevices []RegisteredDevice
+// var deviceNum int32
+// var RegisteredUnits []RegisteredUnit
+// var unitNum int32
+// var units []OnlineUnit
 
 func init() {
 	httpsClient = &http.Client{
@@ -43,6 +51,48 @@ func init() {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
+
+	// SupiRatingGroupIDMap = make(map[string]uint32)
+	// SupiRatingGroupIDMap["imsi-208930000000003"] = 1
+
+	// RegisteredDevices = []RegisteredDevice{{"1", "d1", "123", "192.168.0.0", true}, {"2", "d2", "123", "192.168.0.1", false}, {"3", "d3", "123", "192.168.0.1", true}}
+	// deviceNum = 3
+
+	// RegisteredUnits = []RegisteredUnit{{"1", "u1", "0"}, {"2", "u2", "0"}}
+	// unitNum = 2
+
+	// units = []OnlineUnit{
+	// 	{
+	// 		UnitId:       "1",
+	// 		UnitName:     "u1",
+	// 		BitrateLimit: "111",
+	// 		Members:      []DeviceStatus{{"d1", true}, {"d2", false}},
+	// 	},
+	// 	{
+	// 		UnitId:       "2",
+	// 		UnitName:     "u2",
+	// 		BitrateLimit: "111",
+	// 		Members:      []DeviceStatus{{"d3", true}, {"d4", true}, {"d5", false}},
+	// 	},
+	// 	{
+	// 		UnitId:       "3",
+	// 		UnitName:     "u3",
+	// 		BitrateLimit: "111",
+	// 		Members:      []DeviceStatus{{"d6", true}},
+	// 	},
+	// 	{
+	// 		UnitId:       "4",
+	// 		UnitName:     "u4",
+	// 		BitrateLimit: "111",
+	// 		Members:      []DeviceStatus{{"d7", true}},
+	// 	},
+	// 	{
+	// 		UnitId:       "5",
+	// 		UnitName:     "u5",
+	// 		BitrateLimit: "111",
+	// 		Members:      []DeviceStatus{},
+	// 	},
+	// }
 }
 
 func mapToByte(data map[string]interface{}) (ret []byte) {
@@ -1326,3 +1376,296 @@ func GetUEPDUSessionInfo(c *gin.Context) {
 		})
 	}
 }
+
+// var db_quota = int32(100)
+
+// func GetQuota(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	fmt.Println("Get Quota")
+
+// 	var quotaData QuotaData
+// 	filter := bson.M{"id": 1}
+
+// 	authSubsDataInterface, err := mongoapi.RestfulAPIGetOne(quotaDataColl, filter)
+// 	if err != nil {
+// 		logger.WebUILog.Errorf("GetQuota err: %+v", err)
+// 	}
+
+// 	// var authSubsData models.AuthenticationSubscription
+// 	json.Unmarshal(mapToByte(authSubsDataInterface), &quotaData)
+
+// 	// quotaData := QuotaData{Quota: db_quota}
+
+// 	c.JSON(http.StatusOK, quotaData)
+// }
+
+// func PutQuota(c *gin.Context) {
+// 	setCorsHeader(c)
+// 	logger.WebUILog.Infoln("Put One Quota Data")
+
+// 	var quotaData QuotaData
+
+// 	if err := c.ShouldBindJSON(&quotaData); err != nil {
+// 		logger.WebUILog.Errorf("PutQuota err: %v", err)
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"cause": "JSON format incorrect",
+// 		})
+// 		return
+// 	}
+
+// 	filter := bson.M{"id": 1}
+
+// 	// quotaBsonM := toBsonM(quotaData.Quota)
+
+// 	quotaDataBsonM := bson.M{"id": 1, "quota": quotaData.Quota}
+
+// 	// fmt.Println("quotaData.Quota", quotaData.Quota)
+// 	// db_quota = quotaData.Quota
+
+// 	if _, err := mongoapi.RestfulAPIPutOne(quotaDataColl, filter, quotaDataBsonM); err != nil {
+// 		logger.WebUILog.Errorf("PutQuota err: %+v", err)
+// 	}
+
+// 	c.JSON(http.StatusNoContent, gin.H{})
+// }
+
+// func GetRegisteredUEContext(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	logger.WebUILog.Infoln("Get Registered UE Context")
+
+// 	webuiSelf := webui_context.WEBUI_Self()
+// 	webuiSelf.UpdateNfProfiles()
+
+// 	supi, supiExists := c.Params.Get("supi")
+
+// 	// TODO: support fetching data from multiple AMFs
+// 	if amfUris := webuiSelf.GetOamUris(models.NfType_AMF); amfUris != nil {
+// 		var requestUri string
+
+// 		if supiExists {
+// 			requestUri = fmt.Sprintf("%s/namf-oam/v1/registered-ue-context/%s", amfUris[0], supi)
+// 		} else {
+// 			requestUri = fmt.Sprintf("%s/namf-oam/v1/registered-ue-context", amfUris[0])
+// 		}
+
+// 		resp, err := httpsClient.Get(requestUri)
+// 		if err != nil {
+// 			logger.WebUILog.Error(err)
+// 			c.JSON(http.StatusInternalServerError, gin.H{})
+// 			return
+// 		}
+
+// 		// Filter by tenant.
+// 		tenantId, err := GetTenantId(c)
+// 		if err != nil {
+// 			logger.WebUILog.Errorln(err.Error())
+// 			c.JSON(http.StatusBadRequest, gin.H{
+// 				"cause": "Illegal Token",
+// 			})
+// 			return
+// 		}
+
+// 		if tenantId == "" {
+// 			sendResponseToClient(c, resp)
+// 		} else {
+// 			sendResponseToClientFilterTenant(c, resp, tenantId)
+// 		}
+// 	} else {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"cause": "No AMF Found",
+// 		})
+// 	}
+// }
+
+// func GetUEPDUSessionInfo(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	logger.WebUILog.Infoln("Get UE PDU Session Info")
+
+// 	webuiSelf := webui_context.WEBUI_Self()
+// 	webuiSelf.UpdateNfProfiles()
+
+// 	smContextRef, smContextRefExists := c.Params.Get("smContextRef")
+// 	if !smContextRefExists {
+// 		c.JSON(http.StatusBadRequest, gin.H{})
+// 		return
+// 	}
+
+// 	// TODO: support fetching data from multiple SMF
+// 	if smfUris := webuiSelf.GetOamUris(models.NfType_SMF); smfUris != nil {
+// 		requestUri := fmt.Sprintf("%s/nsmf-oam/v1/ue-pdu-session-info/%s", smfUris[0], smContextRef)
+// 		resp, err := httpsClient.Get(requestUri)
+// 		if err != nil {
+// 			logger.WebUILog.Error(err)
+// 			c.JSON(http.StatusInternalServerError, gin.H{})
+// 			return
+// 		}
+
+// 		sendResponseToClient(c, resp)
+// 	} else {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"cause": "No SMF Found",
+// 		})
+// 	}
+// }
+
+// func GetOnlineUnits(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	logger.WebUILog.Infoln("Get Units")
+
+	
+
+// 	c.JSON(http.StatusOK, units)
+// }
+
+// func GetOnlineDevices(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	logger.WebUILog.Infoln("Get Online Devices")
+
+// 	devices := []OnlineDevice{
+// 		{
+// 			DeviceName: "d1",
+// 			IP:         "192.168.0.1",
+// 			TxBitrate:  "123",
+// 			RSSI:       "10",
+// 			UnitId:     "1",
+// 		},
+// 		{
+// 			DeviceName: "d2",
+// 			IP:         "192.168.0.2",
+// 			TxBitrate:  "456",
+// 			RSSI:       "10",
+// 			UnitId:     "1",
+// 		},
+// 		{
+// 			DeviceName: "d3",
+// 			IP:         "192.168.0.3",
+// 			TxBitrate:  "789",
+// 			RSSI:       "10",
+// 			UnitId:     "2",
+// 		},
+// 		{
+// 			DeviceName: "d4",
+// 			IP:         "192.168.0.4",
+// 			TxBitrate:  "123",
+// 			RSSI:       "10",
+// 			UnitId:     "2",
+// 		},
+// 		{
+// 			DeviceName: "d5",
+// 			IP:         "192.168.0.5",
+// 			TxBitrate:  "456",
+// 			RSSI:       "10",
+// 			UnitId:     "3",
+// 		},
+// 		{
+// 			DeviceName: "d6",
+// 			IP:         "192.168.0.6",
+// 			TxBitrate:  "789",
+// 			RSSI:       "10",
+// 			UnitId:     "3",
+// 		},
+// 		{
+// 			DeviceName: "d7",
+// 			IP:         "192.168.0.7",
+// 			TxBitrate:  "789",
+// 			RSSI:       "10",
+// 			UnitId:     "3",
+// 		},
+// 		{
+// 			DeviceName: "d8",
+// 			IP:         "192.168.0.8",
+// 			TxBitrate:  "789",
+// 			RSSI:       "10",
+// 			UnitId:     "3",
+// 		},
+// 	}
+
+// 	c.JSON(http.StatusOK, devices)
+// }
+
+// func GetRegisteredDevices(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	logger.WebUILog.Infoln("Get Registered Devices")
+// 	c.JSON(http.StatusOK, RegisteredDevices)
+// }
+
+// func DeleteRegisteredDevice(c *gin.Context) {
+// 	setCorsHeader(c)
+// 	deviceId := c.Param("deviceId")
+
+// 	for i, device := range RegisteredDevices {
+// 		if device.DeviceID == deviceId {
+// 			RegisteredDevices = append(RegisteredDevices[:i], RegisteredDevices[i+1:]...)
+// 		}
+// 	}
+
+// 	c.JSON(http.StatusNoContent, gin.H{})
+// }
+
+// func PostRegisteredDevice(c *gin.Context) {
+// 	setCorsHeader(c)
+// 	logger.WebUILog.Infoln("Post One Registered Device Data")
+
+// 	var deviceData RegisteredDevice
+// 	if err := c.ShouldBindJSON(&deviceData); err != nil {
+// 		logger.WebUILog.Errorf("PostRegisteredDevice err: %v", err)
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"cause": "JSON format incorrect",
+// 		})
+// 		return
+// 	}
+
+// 	deviceNum += 1
+// 	deviceData.DeviceID = strconv.Itoa(int(deviceNum))
+
+// 	RegisteredDevices = append(RegisteredDevices, deviceData)
+
+// 	c.JSON(http.StatusCreated, gin.H{})
+// }
+
+// func GetRegisteredUnits(c *gin.Context) {
+// 	setCorsHeader(c)
+
+// 	logger.WebUILog.Infoln("Get Registered Units")
+// 	c.JSON(http.StatusOK, RegisteredUnits)
+// }
+
+// func DeleteRegisteredUnit(c *gin.Context) {
+// 	setCorsHeader(c)
+// 	unitId := c.Param("unitId")
+
+// 	for i, unit := range RegisteredUnits {
+// 		if unit.UnitID == unitId {
+// 			RegisteredUnits = append(RegisteredUnits[:i], RegisteredUnits[i+1:]...)
+// 		}
+// 	}
+
+// 	c.JSON(http.StatusNoContent, gin.H{})
+// }
+
+// func PostRegisteredUnit(c *gin.Context) {
+// 	setCorsHeader(c)
+// 	logger.WebUILog.Infoln("Post One Registered Unit Data")
+
+// 	var unitData RegisteredUnit
+// 	if err := c.ShouldBindJSON(&unitData); err != nil {
+// 		logger.WebUILog.Errorf("PostRegisteredUnit err: %v", err)
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"cause": "JSON format incorrect",
+// 		})
+// 		return
+// 	}
+
+// 	unitNum += 1
+// 	unitData.UnitID = strconv.Itoa(int(unitNum))
+
+// 	RegisteredUnits = append(RegisteredUnits, unitData)
+
+// 	c.JSON(http.StatusCreated, gin.H{})
+// }

@@ -186,6 +186,20 @@ var routes = Routes{
 		PatchSubscriberByID,
 	},
 
+	// {
+	// 	"GetQuota",
+	// 	http.MethodGet,
+	// 	"/quota",
+	// 	GetQuota,
+	// },
+
+	// {
+	// 	"PutQuota",
+	// 	http.MethodPut,
+	// 	"/quota",
+	// 	PutQuota,
+	// },
+
 	{
 		"Registered UE Context",
 		http.MethodGet,
@@ -206,4 +220,60 @@ var routes = Routes{
 		"/ue-pdu-session-info/:smContextRef",
 		GetUEPDUSessionInfo,
 	},
+
+	// {
+	// 	"Online Units",
+	// 	http.MethodGet,
+	// 	"/online-units",
+	// 	GetOnlineUnits,
+	// },
+
+	// {
+	// 	"Online Devices",
+	// 	http.MethodGet,
+	// 	"/online-devices",
+	// 	GetOnlineDevices,
+	// },
+
+	// {
+	// 	"Get Registered Devices",
+	// 	http.MethodGet,
+	// 	"/registered-devices",
+	// 	GetRegisteredDevices,
+	// },
+
+	// {
+	// 	"Delete Registered Device",
+	// 	http.MethodDelete,
+	// 	"/registered-devices/:deviceId",
+	// 	DeleteRegisteredDevice,
+	// },
+
+	// {
+	// 	"Post Registered Device",
+	// 	http.MethodPost,
+	// 	"/registered-devices/",
+	// 	PostRegisteredDevice,
+	// },
+
+	// {
+	// 	"Get Registered Units",
+	// 	http.MethodGet,
+	// 	"/registered-units",
+	// 	GetRegisteredUnits,
+	// },
+
+	// {
+	// 	"Delete Registered Unit",
+	// 	http.MethodDelete,
+	// 	"/registered-units/:unitId",
+	// 	DeleteRegisteredUnit,
+	// },
+
+	// {
+	// 	"Post Registered Unit",
+	// 	http.MethodPost,
+	// 	"/registered-units/",
+	// 	PostRegisteredUnit,
+	// },
 }
