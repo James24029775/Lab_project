@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- combat-deploy.yaml
+- onos-deploy.yaml
+- webui-deploy.yaml
+- video-deploy.yaml
+- text-deploy.yaml
+- nginx-deploy.yaml
+
+- combat-svc.yaml
+- onos-svc.yaml
+- webui-svc.yaml
+- video-svc.yaml
+- text-svc.yaml
+- nginx-svc.yaml
