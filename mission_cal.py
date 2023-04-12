@@ -17,15 +17,27 @@ class RequestHandler(BaseHTTPRequestHandler):
     i = 0
     ms_coordinate_x = -1
     ms_coordinate_y = -1
+
+    # 收到封包後觸發
     def do_POST(self):
+        # 從header讀取body長度並抽出資料
         content_len = int(self.headers.get('content-length'))
         post_body = self.rfile.read(content_len)
-        print(post_body)
+        # print(post_body)
+
+        # 以JSON解析資料
         data = json.loads(post_body)
-        self.ms_coordinate_x = data["coordinate_x"]
-        self.ms_coordinate_y = data["coordinate_y"]
-        print(self.ms_coordinate_x)
-        print(self.ms_coordinate_y)
+        self.ms_ID = data['missionId']
+        self.ms_name = data['missionName']
+        self.ms_coordinate_x = data["MYSELF_Longitude"]
+        self.ms_coordinate_y = data["MYSELF_Latitude"]
+        print("ID:\t\t", self.ms_ID)
+        print("Name:\t\t", self.ms_name)
+        print("Longitude:\t", self.ms_coordinate_x)
+        print("Latitude:\t", self.ms_coordinate_y)
+        print("*"*50)
+
+        # 向client回覆ok訊息
         response_data = '{"response": "ok"}'
         self.send_response(200)
         self.send_header('Content-length', len(response_data))
