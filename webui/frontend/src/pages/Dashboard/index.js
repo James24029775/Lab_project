@@ -66,16 +66,6 @@ class UEInfo extends Component {
 
   componentDidMount() {
     UEInfoApiHelper.fetchRegisteredUE().then();
-
-    // Fetch ue info per 2 seconds
-    // this.ueInfoFetcherTimer = setInterval(async () => {
-    //   await UEInfoApiHelper.fetchRegisteredUE();
-    // }, 2000);
-  }
-
-  componentWillUnmount() {
-    // if (this.ueInfoFetcherTimer)
-    //   clearInterval(this.ueInfoFetcherTimer);
   }
 
   refreshTable() {

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 import time
 import json
 import uuid
-from main import g, app, redis_db
+from main import g, app, redis_db, conn
 # from main import g, users, app, orm, redis_db
 
 mission_blueprint = Blueprint('missionManager', __name__)
@@ -13,7 +13,6 @@ mission_blueprint = Blueprint('missionManager', __name__)
 def get_missions():
     # 從 Redis 取得任務資料
     missions = redis_db.hgetall('missions')
-    # print(type(missions))
 
     # 轉換資料為所需的格式
     mission_list = []
@@ -32,12 +31,12 @@ def get_missions():
     return mission_list, 200
 
 
-@mission_blueprint.route('fetch/<string:missionid>', methods=['GET'])
-def get_missions_by_ID(missionid):
-    mission_data = redis_db.hget("missions", missionid)
+@mission_blueprint.route('fetch/<string:missionId>', methods=['GET'])
+def get_missions_by_ID(missionId):
+    mission_data = redis_db.hget("missions", missionId)
     mission_data = json.loads(mission_data.decode('utf-8')) 
     mission = {
-        'missionId': missionid,
+        'missionId': missionId,
         'missionName': mission_data.get('missionName', ''),
         'MYSELF_Longitude': mission_data.get('MYSELF_Longitude', ''),
         'MYSELF_Latitude': mission_data.get('MYSELF_Latitude', '')
@@ -61,33 +60,45 @@ def create_mission():
         'time': myself_timer
     }
     # 生成Mission ID
-    mission_id = str(uuid.uuid4())
+    missionId = str(uuid.uuid4())
     mission_data_str = json.dumps(mission_data)  # 將字典轉換為字串
-    redis_db.hmset('missions', {mission_id: mission_data_str})
+    redis_db.hmset('missions', {missionId: mission_data_str})
+
+    mission_data['missionId'] = missionId
+    forwardData2MissionCalculator(json.dumps(mission_data))
     
     return 'Mission has been created successfully.', 200
 
 
-@mission_blueprint.route("update/<string:missionid>", methods=['PUT'])
-def update_mission(missionid):
+@mission_blueprint.route("update/<string:missionId>", methods=['PUT'])
+def update_mission(missionId):
     mission_data = request.get_json()
-    original_mission_data = redis_db.hget("missions", missionid)
+    original_mission_data = redis_db.hget("missions", missionId)
     original_mission_data = json.loads(original_mission_data.decode('utf-8')) 
     mission_data['time'] = original_mission_data['time']
     mission_data_str = json.dumps(mission_data)  # 將字典轉換為字串
-    redis_db.hmset('missions', {missionid: mission_data_str})
+    redis_db.hmset('missions', {missionId: mission_data_str})
+
+    mission_data['missionId'] = missionId
+    forwardData2MissionCalculator(json.dumps(mission_data))
     
     return 'Mission has been updated successfully.', 200
 
 
-@mission_blueprint.route("delete/<string:missionid>", methods=["DELETE"])
-def delete_mission(missionid):
+@mission_blueprint.route("delete/<string:missionId>", methods=["DELETE"])
+def delete_mission(missionId):
     # 從 Redis 取得任務資料
     missions = redis_db.hgetall('missions')
 
     # 檢查missionid是否存在
-    if redis_db.hexists('missions', missionid):
-        redis_db.hdel('missions', missionid)
+    if redis_db.hexists('missions', missionId):
+        redis_db.hdel('missions', missionId)
         return "Ok", 200
     else:
         return "not found", 404
+    
+def forwardData2MissionCalculator(json_data):
+    headers = {'Content-type': 'application/json'}
+    conn.request('POST', '/path/to/resource', body=json_data, headers=headers)
+    res = conn.getresponse()
+    data = res.read().decode()

@@ -5,14 +5,47 @@ import { Button, Table } from "react-bootstrap";
 import MissionModal from "./components/MissionModal";
 import ApiHelper from "../../util/ApiHelper";
 
+
+const pollInterval = 2000;
+
 class MissionOverview extends Component {
   state = {
     missionModalOpen: false,
     missionModalData: null,
+    lastMissionData: null,
+    currentMissionData: null,
+  };
+
+  // Myself, if 
+  checkDatabaseUpdates = async () => {
+    const result = await ApiHelper.fetchTheNewestMission();
+    if (!result) {
+      alert("Error fetch the newest mission data.");
+      return;
+    }
+    let lastData = this.state.lastMissionData;
+    console.log("lastData", lastData)
+    console.log("currentData", result)
+    if (JSON.stringify(lastData) !== JSON.stringify(result)) {
+      console.log('New data:', result);
+      this.setState({ lastMissionData: result, currentMissionData: result });
+      ApiHelper.fetchMissions().then();
+    } else {
+      console.log('No new data');
+    }
   };
 
   componentDidMount() {
     ApiHelper.fetchMissions().then();
+    this.checkDatabaseUpdates();
+    
+    this.intervalId = setInterval(() => {
+      this.checkDatabaseUpdates();
+    }, pollInterval);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalId);
   }
 
   openAddMission() {
@@ -35,12 +68,16 @@ class MissionOverview extends Component {
     });
   }
 
-  async addMission(missiondData) {
+  async addMission(missionData) {
     console.log(" addMission check 1");
-    this.setState({ missionModalOpen: false });
+    this.setState({ missionModalOpen: false, missionModalData: missionData});
+
+    // const result = await ApiHelper.fetchTheNewestMission();
+    // this.setState({ lastMissionData: result, currentMissionData: result});
+
     console.log(" addMission check 2");
 
-    if (!await ApiHelper.createMission(missiondData)) {
+    if (!await ApiHelper.createMission(missionData)) {
       alert("Error creating new mission");
     }
     console.log(" addMission check 3");
@@ -52,7 +89,9 @@ class MissionOverview extends Component {
    * @param missionData
    */
   async updateMission(missionData) {
-    this.setState({ missionModalOpen: false });
+    this.setState({ missionModalOpen: false, missionModalData: missionData});
+    // const result = await ApiHelper.fetchTheNewestMission();
+    // this.setState({ lastMissionData: result, currentMissionData: result});
 
     const result = await ApiHelper.updateMission(missionData);
 

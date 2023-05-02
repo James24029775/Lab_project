@@ -1,6 +1,7 @@
 from flask import Flask, g, Response, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask import Blueprint, render_template
+import http.client
 
 import flask_cors
 import time
@@ -26,6 +27,8 @@ redis_db = redis.db
 # from models import *
 # orm = database(app.logger)
 
+# 與mission calculator連線
+conn = http.client.HTTPConnection('localhost', 7000)
 
 #! Have problems, not check yet
 import routes

@@ -21,7 +21,15 @@ const renderApp = Component => {
   );
 };
 
+// const startRenderAppInterval = () => {
+//   setInterval(() => {
+//     renderApp(App);
+//     console.log("DDDDDDDDDDDDDDDDDDDDDD");
+//   }, 1000);
+// };
+
 renderApp(App);
+// startRenderAppInterval();
 
 if (module.hot) {
   module.hot.accept('./pages/App', () => {

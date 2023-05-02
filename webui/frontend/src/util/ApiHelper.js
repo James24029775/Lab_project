@@ -108,6 +108,19 @@ class ApiHelper {
     return false;
   }
 
+  static async fetchTheNewestMission() {
+    try {
+      let user = LocalStorageHelper.getUserInfo();
+      axios.defaults.headers.common['Token'] = user.accessToken;
+      let response = await Http.get(`mission/getmission`);
+      if (response.status === 200 && response.data) {
+        return response.data;
+      }
+    } catch (error) {
+    }
+    return false;
+  }
+
   static async fetchMissionById(id) {
     try {
       let user = LocalStorageHelper.getUserInfo();

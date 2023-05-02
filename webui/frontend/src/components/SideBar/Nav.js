@@ -40,6 +40,13 @@ class Nav extends Component {
           </Link>
         </li>
 
+        {/* <li className={this.isPathActive('/registered-ue-page') ? 'active' : null}>
+          <Link to="/registered-ue-page">
+            <i className="pe-7s-star"/>
+            <p>Missions </p>
+          </Link>
+        </li> */}
+
       {childView}
 
       </ul>

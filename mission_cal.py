@@ -9,7 +9,7 @@ import logging
 import redis
 import socket
 
-
+msg = "I HAVE RECEIVED THE NEWEST MISSION INSTRUCTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 class RequestHandler(BaseHTTPRequestHandler):
     
@@ -31,11 +31,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.ms_name = data['missionName']
         self.ms_coordinate_x = data["MYSELF_Longitude"]
         self.ms_coordinate_y = data["MYSELF_Latitude"]
+        print(msg)
         print("ID:\t\t", self.ms_ID)
         print("Name:\t\t", self.ms_name)
         print("Longitude:\t", self.ms_coordinate_x)
         print("Latitude:\t", self.ms_coordinate_y)
-        print("*"*50)
+        print("*"*len(msg))
 
         # 向client回覆ok訊息
         response_data = '{"response": "ok"}'
