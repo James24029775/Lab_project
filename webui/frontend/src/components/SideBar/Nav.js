@@ -26,9 +26,9 @@ class Nav extends Component {
     //  */
     return (
       <ul className="nav">
-        <li className={location.pathname === '/' ? 'active' : null}>
-          <Link to="/">
-            <i className="pe-7s-network"/>
+        <li className={location.pathname === '/realtime_status' ? 'active' : null}>
+          <Link to="/realtime_status">
+            <i className="pe-7s-info"/>
             <p>Realtime Status</p>
           </Link>
         </li>
@@ -40,12 +40,20 @@ class Nav extends Component {
           </Link>
         </li>
 
-        {/* <li className={this.isPathActive('/registered-ue-page') ? 'active' : null}>
-          <Link to="/registered-ue-page">
-            <i className="pe-7s-star"/>
-            <p>Missions </p>
+        <li className={location.pathname === '/device_management' ? 'active' : null}>
+          <Link to="/device_management">
+            <i className="pe-7s-phone"/>
+            <p>Device Management</p>
           </Link>
-        </li> */}
+        </li>
+
+        <li className={location.pathname === '/unit_management' ? 'active' : null}>
+          <Link to="/unit_management">
+            <i className="pe-7s-network"/>
+            <p>Unit Management</p>
+          </Link>
+        </li>
+
 
       {childView}
 

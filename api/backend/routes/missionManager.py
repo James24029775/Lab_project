@@ -3,7 +3,6 @@ import time
 import json
 import uuid
 from main import g, app, redis_db, conn
-# from main import g, users, app, orm, redis_db
 
 mission_blueprint = Blueprint('missionManager', __name__)
 
@@ -16,11 +15,11 @@ def get_missions():
 
     # 轉換資料為所需的格式
     mission_list = []
-    for mission_id, mission_data in missions.items():
-        mission_id = mission_id.decode('utf-8') # 將 bytes 轉換為字串
+    for missionId, mission_data in missions.items():
+        missionId = missionId.decode('utf-8') # 將 bytes 轉換為字串
         mission_data = json.loads(mission_data.decode('utf-8')) 
         mission = {
-            'missionId': mission_id,
+            'missionId': missionId,
             'missionName': mission_data.get('missionName', ''),
             'MYSELF_Longitude': mission_data.get('MYSELF_Longitude', ''),
             'MYSELF_Latitude': mission_data.get('MYSELF_Latitude', ''),
@@ -87,9 +86,6 @@ def update_mission(missionId):
 
 @mission_blueprint.route("delete/<string:missionId>", methods=["DELETE"])
 def delete_mission(missionId):
-    # 從 Redis 取得任務資料
-    missions = redis_db.hgetall('missions')
-
     # 檢查missionid是否存在
     if redis_db.hexists('missions', missionId):
         redis_db.hdel('missions', missionId)

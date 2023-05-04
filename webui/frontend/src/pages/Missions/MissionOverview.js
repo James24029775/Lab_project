@@ -77,9 +77,10 @@ class MissionOverview extends Component {
 
     console.log(" addMission check 2");
 
-    if (!await ApiHelper.createMission(missionData)) {
-      alert("Error creating new mission");
-    }
+    await ApiHelper.createMission(missionData)
+    // if (!await ApiHelper.createMission(missionData)) {
+    //   alert("Error creating new mission");
+    // }
     console.log(" addMission check 3");
 
     ApiHelper.fetchMissions().then();
@@ -95,9 +96,9 @@ class MissionOverview extends Component {
 
     const result = await ApiHelper.updateMission(missionData);
 
-    if (!result) {
-      alert("Error updating mission: " + missionData["ueId"]);
-    }
+    // if (!result) {
+    //   alert("Error updating mission: " + missionData["ueId"]);
+    // }
     ApiHelper.fetchMissions().then();
   }
 

@@ -1,22 +1,20 @@
-import React from 'react';
-import {Route, withRouter} from 'react-router-dom';
-import {connect} from 'react-redux';
-import cx from 'classnames';
-import {setMobileNavVisibility} from '../../redux/reducers/layout';
+import React from "react";
+import { Route, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import cx from "classnames";
+import { setMobileNavVisibility } from "../../redux/reducers/layout";
 
-import Header from './Header';
-import Footer from './Footer';
-import SideBar from '../../components/SideBar';
+import Header from "./Header";
+import Footer from "./Footer";
+import SideBar from "../../components/SideBar";
 /**
  * Pages
  */
-import Subscribers from '../Subscribers';
-import Tasks from '../Tasks';
-import UEInfo from '../Dashboard';
-import UEInfoDetail from '../UEInfoDetail';
-// import Tenants from '../Tenants';
-import Users from '../Users';
-import Missions from '../Missions';
+
+import RealtimeStatus from "../RealtimeStatus";
+import DeviceManagement from "../DeviceManagement";
+import UnitManagement from "../UnitManagement";
+import Missions from "../Missions";
 
 const Main = ({
                 mobileNavVisibility,
@@ -36,7 +34,7 @@ const Main = ({
 
   return (
     <div className={cx({
-      'nav-open': mobileNavVisibility === true
+      "nav-open": mobileNavVisibility === true
     })}>
       <div className="wrapper">
         <div className="close-layer" onClick={hideMobileMenu}/>
@@ -44,15 +42,11 @@ const Main = ({
 
         <div className="main-panel">
           <Header/>
-
-          <Route exact path="/" component={UEInfo}/>
-          <Route exact path="/subscriber" component={Subscribers}/>
-          <Route exact path="/tasks" component={Tasks}/>
-          <Route exact path="/ueinfo" component={UEInfo}/>
-          <Route exact path="/ueinfo/:id" component={UEInfoDetail}/>
+          <Route exact path="/" component={RealtimeStatus} />
+          <Route exact path="/realtime_status" component={RealtimeStatus} />
+          <Route exact path="/device_management" component={DeviceManagement} />
+          <Route exact path="/unit_management" component={UnitManagement} />
           <Route exact path="/mission" component={Missions}/>
-          <Route exact path="/users/:id" component={Users}/>
-
           <Footer/>
         </div>
       </div>
