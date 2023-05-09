@@ -38,27 +38,11 @@ def newDevice(deviceName):
         secret = request.get_json()["secret"]
         status = False
         txbitrate = rssi = ssid = bssid = 'N/A'
-        myself_timer = time.time()
+        timestamp = time.time()
         
         # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
         # if g.user and g.user.role >= 50:
-        deviceId = str(uuid.uuid4())
-        # 將任務資料設定到 Redis 中
-        deviceData = {
-            'deviceName': deviceName,
-            'secret': secret,
-            'ip': ip,
-            'txbitrate': txbitrate,
-            'rssi': rssi,
-            'ssid': ssid,
-            'bssid': bssid,
-            'status': status,
-            'timestamp': myself_timer,
-        }
-        device_data_str = json.dumps(deviceData)
-        redis_db.hmset('devices', {deviceId: device_data_str})\
-        # 不知為何會錯
-        # redis.addDevice(deviceName, secret, ip, myself_timer)
+        redis.addDevice(deviceName, secret, ip, txbitrate, rssi, ssid, bssid, status, timestamp)
         return ("Ok", 200)
         # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
         # else:
@@ -103,12 +87,7 @@ def getdevice():
 def delDevice(deviceName):
     # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     # if g.user and g.user.role >= 50:
-    deviceId = redis.findDevice(deviceName)
-    if redis_db.hexists('devices', deviceId):
-        redis_db.hdel('devices', deviceId)
-        return ("Ok", 200)
-    else:
-        return ("not found", 404)
+    return redis.delDevice(deviceName)
     # else:
     #     return ("Unauthorized", 403)
 
@@ -120,3 +99,40 @@ def delDevice(deviceName):
     #     return "Ok", 200
     # else:
     #     return "not found", 404
+
+@device_blueprint.route("<string:deviceName>/join/<string:unitName>", methods=["POST"])
+def joinUnit(deviceName, unitName):
+    query = None
+    # query = g.user and orm.checkPermission(g.user.name, groupName)
+
+    # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+    # if g.user and (g.user.role >= 50 or (query and query.role == 2)):
+    try:
+        if redis.findDevice(deviceName) and redis.findUnit(unitName):
+            redis.joinUnit(unitName, deviceName)
+            return ("Ok", 200)
+        else:
+            return("Object not founds.", 404)
+    except Exception as e:
+        return (e.__str__()+"\nMost likely duplicate.", 400)
+    # else:
+    #     return ("Unauthorized", 403)
+
+
+@device_blueprint.route("<string:deviceName>/leave/<string:unitName>", methods=["POST"])
+def leaveUnit(deviceName, unitName):
+    query = None
+    # query = g.user and orm.checkPermission(g.user.name, groupName)
+    # app.logger.info(g.user.role)
+    # return ("ok",200)
+
+
+    # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+    # if g.user and (g.user.role >= 50 or (query and query.role == 2)):
+    try:
+        return redis.leaveUnit(unitName, deviceName)
+    except Exception as e:
+        return(e.__str__()+"\nMost likely object not found.", 400)
+    # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+    # else:
+    #     return ("Unauthorized", 403)

@@ -11,11 +11,8 @@ def getUnits():
         # group_result = []
         for unit in redis.listUnits(group['groupId']):
             members = []
-            # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-            # listDevices()不是原本的(是用listAllDevices())，之後要改回第一年的listDevices()的做法
-            for membership in redis.listDevices(unit['unitId']):
-                deviceName = redis.findDeviceById(membership['deviceId'])
-                deviceId = membership['deviceId']
+            for device in redis.listDevices(unit['unitId']):
+                deviceName = redis.findDeviceById(device['deviceId'])
 
                 # check if device online
                 # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
@@ -26,32 +23,40 @@ def getUnits():
 
                 # 在這裡打住，因為要先釐清heartbeat怎麼運作，不然根本沒有下面那些資料可以展示！！！！！！！！！！！！！！！！！！！！！！！
                 # 但好像又沒差，因為txbitrate, rssi可以是N/A
+                txbitrate = rssi = ssid = bssid = 'N/A'
                 if deviceName in keys:
                     # online     
                     device = {
-                            "deviceId":membership['deviceId'],
-                            "name": membership['deviceName'],
-                            "secret": membership['secret'],
-                            # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-                            # "ip": redis.db["ip_%s" % device.name].decode(),
-                            # "txbitrate": redis.db["txbitrate_%s" % device.name].decode(),
-                            # "rssi": redis.db["rssi_%s" % device.name].decode(),
-                            "ip": 'None',
-                            "txbitrate": 'None',
-                            "rssi": 'None',
-                            "status": True
-                        }
+                        "deviceId":device['deviceId'],
+                        "name": device['deviceName'],
+                        "secret": device['secret'],
+                        "ip": device['ip'],
+                        # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                        "txbitrate": txbitrate,
+                        "rssi": rssi,
+                        'ssid': ssid,
+                        # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                        'bssid': bssid,
+                        'status': True,
+                        'timestamp': device['timestamp'],
+                        # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                        # "ip": redis.db["ip_%s" % device.name].decode(),
+                        # "txbitrate": redis.db["txbitrate_%s" % device.name].decode(),
+                        # "rssi": redis.db["rssi_%s" % device.name].decode(),
+                    }
                 else:
                     # offline
                     device = {
-                            "deviceId":membership['deviceId'],
-                            "name": membership['deviceName'],
-                            "secret": membership['secret'],
-                            "ip": membership['ip'],
-                            "txbitrate": '',
-                            "rssi": '',
-                            "status": False
-                        }
+                        "name": device['deviceName'],
+                        "secret": device['secret'],
+                        "ip": device['ip'],
+                        "txbitrate": txbitrate,
+                        "rssi": rssi,
+                        'ssid': ssid,
+                        'bssid': bssid,
+                        'status': False,
+                        'timestamp': device['timestamp'],
+                }
                 members.append(device)
             unit_dir = {"unitId": unit['unitId'], "unitName": unit['unitName'], "bandwidthLimit": unit['bandwidthLimit'], "members": members}
 
@@ -67,5 +72,6 @@ def getUnits():
     #     policies.append((policy.source, policy.destination, policy.limits))
 
     # result['policies'] = policies
-    app.logger.info(result)
+    
+    # app.logger.info(result)
     return (json.dumps(result), 200)

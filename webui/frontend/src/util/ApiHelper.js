@@ -255,42 +255,44 @@ class ApiHelper {
   }
 
   // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-  // static async addDeviceToUnit(device, unit) {
-  //   try {
-  //     let user = LocalStorageHelper.getUserInfo();
-  //     axios.defaults.headers.common[
-  //       "Authorization"
-  //     ] = `Bearer ${user.accessToken}`;
+  static async addDeviceToUnit(device, unit) {
 
-  //     let response = await Http.post(`device/${device}/join/${unit}`);
-  //     if (response.status === 201 || response.status === 200) {
-  //       return true;
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
+    try {
+      let user = LocalStorageHelper.getUserInfo();
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${user.accessToken}`;
 
-  //   return false;
-  // }
+      console.log(device, unit);
+      let response = await Http.post(`device/${device}/join/${unit}`);
+      if (response.status === 201 || response.status === 200) {
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    return false;
+  }
 
 
-  // static async deleteDeviceFromUnit(device, unit) {
-  //   try {
-  //     let user = LocalStorageHelper.getUserInfo();
-  //     axios.defaults.headers.common[
-  //       "Authorization"
-  //     ] = `Bearer ${user.accessToken}`;
+  static async deleteDeviceFromUnit(device, unit) {
+    try {
+      let user = LocalStorageHelper.getUserInfo();
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${user.accessToken}`;
+      console.log(`device/${device}/leave/${unit}`);
+      let response = await Http.post(`device/${device}/leave/${unit}`);
+      if (response.status === 201 || response.status === 200) {
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
 
-  //     let response = await Http.post(`device/${device}/leave/${unit}`);
-  //     if (response.status === 201 || response.status === 200) {
-  //       return true;
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-
-  //   return false;
-  // }
+    return false;
+  }
 
 
   static async deleteRegisteredDevice(DeviceName) {
@@ -319,36 +321,36 @@ class ApiHelper {
   }
 
 
-  static async fetchRegisteredUnits() {
-    const MSG_FETCH_ERROR = "Error fetching online registered units.";
+  // static async fetchRegisteredUnits() {
+  //   const MSG_FETCH_ERROR = "Error fetching online registered units.";
 
-    try {
-      let response = await Http.get("registered-units");
-      if (response.status === 200 && response.data) {
-        const units = response.data.map(
-          (val) =>
-            new RegisteredUnit(
-              val["unitID"],
-              val["unitName"],
-              val["bitrateLimit"]
-            )
-        );
-        store.dispatch(registeredActions.setRegisteredUnit(units));
-        return true;
-      }
-    } catch (error) {
-      let err_msg;
-      if (error.response && error.response.data) {
-        err_msg = error.response.data.cause || MSG_FETCH_ERROR;
-      } else {
-        err_msg = MSG_FETCH_ERROR;
-      }
-      console.log(error.response);
-      store.dispatch(registeredActions.setRegisteredUnitError(err_msg));
-    }
+  //   try {
+  //     let response = await Http.get("registered-units");
+  //     if (response.status === 200 && response.data) {
+  //       const units = response.data.map(
+  //         (val) =>
+  //           new RegisteredUnit(
+  //             val["unitID"],
+  //             val["unitName"],
+  //             val["bitrateLimit"]
+  //           )
+  //       );
+  //       store.dispatch(registeredActions.setRegisteredUnit(units));
+  //       return true;
+  //     }
+  //   } catch (error) {
+  //     let err_msg;
+  //     if (error.response && error.response.data) {
+  //       err_msg = error.response.data.cause || MSG_FETCH_ERROR;
+  //     } else {
+  //       err_msg = MSG_FETCH_ERROR;
+  //     }
+  //     console.log(error.response);
+  //     store.dispatch(registeredActions.setRegisteredUnitError(err_msg));
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   static async createRegisteredUnit(unitData) {
     try {

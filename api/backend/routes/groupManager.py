@@ -100,10 +100,7 @@ def deleteUnit(groupName, unitName):
     # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     # query = g.user and orm.checkPermission(g.user.name, groupName)
     # if g.user and (g.user.role >= 50 or (query and query.role == 2)):
-    unitId = redis.findUnit(unitName)
-    if redis_db.hexists('units', unitId):
-        redis_db.hdel('units', unitId)
-    return ("Ok", 200)
+    return redis.delUnit(unitName)
     # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     # else:
         # return ("Unauthorized", 403)

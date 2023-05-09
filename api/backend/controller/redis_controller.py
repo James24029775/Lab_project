@@ -5,25 +5,62 @@ import uuid
 import _thread
 from main import g, app
 
+def prink(msg):
+    print("\033[38;5;218m" + msg + "\033[0m")
+
 class device:
     @staticmethod
-    def add(deviceName, secret, ip, redis_db, timestamp):
-        deviceId = str(uuid.uuid4())
-        # 將任務資料設定到 Redis 中
-        deviceData = {
-            'deviceName': deviceName,
-            'secret': secret,
-            'ip': ip,
-            'timestamp': timestamp,
-        }
-        device_data_str = json.dumps(deviceData)
-        redis_db.hmset('devices', {deviceId: device_data_str})
+    def add(deviceName, secret, ip, txbitrate, rssi, ssid, bssid, status, timestamp, redis_db):
+        try:
+            deviceId = str(uuid.uuid4())
+            deviceData = {
+                'deviceName': deviceName,
+                'secret': secret,
+                'ip': ip,
+                'txbitrate': txbitrate,
+                'rssi': rssi,
+                'ssid': ssid,
+                'bssid': bssid,
+                'status': status,
+                'timestamp': timestamp,
+            }
+            device_data_str = json.dumps(deviceData)
+            redis_db.hmset('devices', {deviceId: device_data_str})
+            prink('device:' + deviceName + ' add successfully.')
+            return ("Ok", 200)
+
+        except:
+            prink('device:' + deviceName + ' failed to add.')
+            return ("Bad request", 400)
+
+    @staticmethod
+    def delete(deviceName, redis_db):
+        deviceId = device.getIdByName(deviceName, redis_db)
+        try:
+            redis_db.hdel('devices', deviceId)
+            prink('device:' + deviceName + ' has been deleted.')
+            try:
+                uids = membership.getUnitIdByDeviceId(deviceId, redis_db)
+                if len(uids) == 0:
+                    prink('device:' + deviceName + ' does not have any membership.')
+                    return ("Ok", 200)
+                for uid in uids:
+                    membership.delete(uid, deviceId, redis_db)
+                prink('Membership about device:' + deviceName + ' has been deleted.')
+                return ("Ok", 200)
+            
+            except:
+                prink('Membership fail to delete.')
+                return ("not found", 404)
+        except:
+            prink('device:' + deviceName + ' does not exist.')
+            return ("not found", 404)
 
     @staticmethod
     def getIdByName(queryDeviceName, redis_db):
         devices = redis_db.hgetall('devices')
         for deviceId, deviceData in devices.items():
-            deviceId = deviceId.decode('utf-8') # 將 bytes 轉換為字串
+            deviceId = deviceId.decode('utf-8')
             deviceData = json.loads(deviceData.decode('utf-8'))
             deviceName = deviceData['deviceName']
 
@@ -36,7 +73,7 @@ class device:
     def getNameById(queryDeviceId, redis_db):
         devices = redis_db.hgetall('devices')
         for deviceId, deviceData in devices.items():
-            deviceId = deviceId.decode('utf-8') # 將 bytes 轉換為字串
+            deviceId = deviceId.decode('utf-8')
             deviceData = json.loads(deviceData.decode('utf-8'))
             deviceName = deviceData['deviceName']
 
@@ -46,11 +83,11 @@ class device:
         return None
     
     @staticmethod
-    def get_all(redis_db):
+    def getAll(redis_db):
         result = []
         devices = redis_db.hgetall('devices')
         for deviceId, deviceData in devices.items():
-            deviceId = deviceId.decode('utf-8') # 將 bytes 轉換為字串
+            deviceId = deviceId.decode('utf-8')
             deviceData = json.loads(deviceData.decode('utf-8')) 
             device = {
                 'deviceId': deviceId,
@@ -108,24 +145,31 @@ class device:
 #         self.role = role
 #         db.session.commit()
 
-
-
 class group:
     @staticmethod
     def add(groupName, redis_db):
-        groupId = str(uuid.uuid4())
-        # 將任務資料設定到 Redis 中
-        groupData = {
-            'groupName': groupName
-        }
-        group_data_str = json.dumps(groupData)
-        redis_db.hmset('groups', {groupId: group_data_str})
+        try:
+            groupId = str(uuid.uuid4())
+            groupData = {
+                'groupName': groupName
+            }
+            group_data_str = json.dumps(groupData)
+            redis_db.hmset('groups', {groupId: group_data_str})
+            prink('group:' + groupName + ' add successfully.')
+            return ("Ok", 200)
+
+        except:
+            prink('group:' + groupName + ' failed to add.')
+            return ("not found", 404)
+        
+    # @staticmethod
+    # def delete(groupName, redis_db):
 
     @staticmethod
     def getIdByName(queryGroupName, redis_db):
         groups = redis_db.hgetall('groups')
         for groupId, groupData in groups.items():
-            groupId = groupId.decode('utf-8') # 將 bytes 轉換為字串
+            groupId = groupId.decode('utf-8')
             groupData = json.loads(groupData.decode('utf-8'))
             groupName = groupData['groupName']
 
@@ -135,11 +179,11 @@ class group:
         return None
 
     @staticmethod
-    def get_all(redis_db):
+    def getAll(redis_db):
         result = []
         groups = redis_db.hgetall('groups')
         for groupId, groupData in groups.items():
-            groupId = groupId.decode('utf-8') # 將 bytes 轉換為字串
+            groupId = groupId.decode('utf-8')
             groupData = json.loads(groupData.decode('utf-8')) 
             group = {
                 'groupId': groupId,
@@ -149,25 +193,84 @@ class group:
 
         return result
 
+
 class unit:
     @staticmethod
     def add(unitName, groupId, bandwidthLimit, redis_db):
-        unitId = str(uuid.uuid4())
-        # 將任務資料設定到 Redis 中
-        unitData = {
-            'unitName': unitName,
-            'groupId': groupId,
-            'bandwidthLimit': bandwidthLimit,
-        }
-        unit_data_str = json.dumps(unitData)
-        redis_db.hmset('units', {unitId: unit_data_str})
+        try:
+            unitId = str(uuid.uuid4())
+            unitData = {
+                'unitName': unitName,
+                'groupId': groupId,
+                'bandwidthLimit': bandwidthLimit,
+            }
+            unit_data_str = json.dumps(unitData)
+            redis_db.hmset('units', {unitId: unit_data_str})
+            prink('unit:' + unitName + ' add successfully.')
+            return ("Ok", 200)
+        
+        except:
+            prink('unit:' + unitName + ' failed to add.')
+            return ("Bad request", 400)
+        
+    @staticmethod
+    def delete(queryUnitName, redis_db):
+        unitId = unit.getIdByName(queryUnitName, redis_db)
+        try:
+            redis_db.hdel('units', unitId)
+            prink('unit:' + queryUnitName + ' has been deleted.')
+            try:
+                devices = membership.getDevicesByUnitId(unitId, redis_db)
+                if len(devices) == 0:
+                    prink('unit:' + queryUnitName + ' does not have any membership.')
+                    return ("Ok", 200)
+                
+                for device in devices:
+                    deviceId = device['deviceId']
+                    deviceName = device['deviceName']
+                    membership.delete(unitId, deviceId, redis_db)
+                return ("Ok", 200)
+                
+            except:
+                prink('Membership of ' + queryUnitName + ' and ' + deviceName + ' does not exist.')
+                return ("not found", 404)
+
+        except:
+            prink('Membership fail to delete.')
+            return ("not found", 404)
+    
+    @staticmethod
+    def getIdByName(queryUnitName, redis_db):
+        units = redis_db.hgetall('units')
+        for unitId, unitData in units.items():
+            unitId = unitId.decode('utf-8')
+            unitData = json.loads(unitData.decode('utf-8'))
+            unitName = unitData['unitName']
+
+            if unitName == queryUnitName:
+                return unitId
+            
+        return None
+    
+    @staticmethod
+    def getNameById(queryUnitId, redis_db):
+        units = redis_db.hgetall('units')
+        for unitId, unitData in units.items():
+            unitId = unitId.decode('utf-8')
+            unitData = json.loads(unitData.decode('utf-8'))
+            unitName = unitData['unitName']
+
+            if unitId == queryUnitId:
+                return unitName
+            
+        return None
 
     @staticmethod
-    def get_all(groupId, redis_db):
+    def getAll(groupId, redis_db):
         result = []
         units = redis_db.hgetall('units')
         for unitId, unitData in units.items():
-            unitId = unitId.decode('utf-8') # 將 bytes 轉換為字串
+            unitId = unitId.decode('utf-8')
             unitData = json.loads(unitData.decode('utf-8')) 
             unit = {
                 'unitId': unitId,
@@ -179,38 +282,78 @@ class unit:
                 result.append(unit)
 
         return result
-    
-    @staticmethod
-    def getIdByName(queryUnitName, redis_db):
-        units = redis_db.hgetall('units')
-        for unitId, unitData in units.items():
-            unitId = unitId.decode('utf-8') # 將 bytes 轉換為字串
-            unitData = json.loads(unitData.decode('utf-8'))
-            unitName = unitData['unitName']
-
-            if unitName == queryUnitName:
-                return unitId
-            
-        return None
 
 
 class membership:
     @staticmethod
-    def add_membership(uid, did, redis_db):
-        key = f'membership:{uid}'
-        value = {did: 1}
-        redis_db.hset(key, mapping=value)
+    def add(uid, did, redis_db):
+        try:
+            unitName = unit.getNameById(uid, redis_db)
+            deviceName = device.getNameById(did, redis_db)
+            value = unitName + ':' + deviceName
+            key = str(uid) + ':' + str(did)
+            redis_db.hset("membership", key, value)
+            prink('membership:' + value + ' add successfully.')
+            return ("Ok", 200)
+        except:
+            prink('membership:' + value + ' failed to add.')
+            return ("Bad request", 400)
 
     @staticmethod
-    def delete_membership(uid, did, redis_db):
-        key = f'membership:{uid}'
-        redis_db.hdel(key, did)
+    def delete(uid, did, redis_db):
+        try:
+            key = str(uid) + ':' + str(did)
+            value = redis_db.hget("membership", key).decode('utf-8')
+            if value is None:
+                prink('membership does not exist.')
+                return ("not found", 404)
+            else:
+                redis_db.hdel("membership", key)
+                prink('membership:' + value + ' delete successfully')
+                return ('Ok', 200)
+        except:
+            prink('membership:' + value + ' failed to delete.')
+            return ("not found", 404)
 
     @staticmethod
-    def get_devices_by_unit(uid, redis_db):
-        key = f'membership:{uid}'
-        return list(map(int, redis_db.hkeys(key)))
+    def getDevicesByUnitId(queryUid, redis_db):
+        memberships = redis_db.hgetall("membership")
+        result = []
+        for key, value in memberships.items():
+            key = key.decode('utf-8')
+            key = key.split(':')
+            uid, did = key[0], key[1]
+            if uid == queryUid:
+                deviceData = redis_db.hget('devices', did)
+                deviceData = json.loads(deviceData.decode('utf-8')) 
+                device = {
+                    'deviceId': did,
+                    'deviceName': deviceData.get('deviceName', ''),
+                    'secret': deviceData.get('secret', ''),
+                    'ip': deviceData.get('ip', ''),
+                    'txbitrate': deviceData.get('txbitrate', ''),
+                    'rssi': deviceData.get('rssi', ''),
+                    'ssid': deviceData.get('ssid', ''),
+                    'bssid': deviceData.get('bssid', ''),
+                    'status': deviceData.get('status', ''),
+                    'timestamp': deviceData.get('timestamp', ''),
+                }
+                result.append(device)
+            
+        return result
 
+    @staticmethod
+    def getUnitIdByDeviceId(queryDid, redis_db):
+        memberships = redis_db.hgetall("membership")
+        result = []
+        for key, value in memberships.items():
+            key = key.decode('utf-8')
+            key = key.split(':')
+            uid, did = key[0], key[1]
+            if did == queryDid:
+                result.append(uid)
+            
+        return result
 
 # class groupDevice(db.Model):
 #     __tablename__ = "groupDevices"
@@ -238,18 +381,7 @@ class membership:
 #         # 0 -> None
 #         # 1 -> RO
 #         # 2 -> RW
-        
 
-# class membership(db.Model):
-#     __tablename__   = "membership"
-#     __table_args__ = (db.UniqueConstraint("unitId", "deviceId"), db.PrimaryKeyConstraint("unitId", "deviceId"))
-
-#     unitId = db.Column(db.Integer, db.ForeignKey("units.unitId"), nullable = False)
-#     deviceId  = db.Column(db.Integer, db.ForeignKey("devices.deviceId"), nullable = False)
-
-#     def __init__(self, uid, did):
-#         self.unitId = uid
-#         self.deviceId = did
 
 # class policies(db.Model):
 #     __tablename__   = "policies"
@@ -307,10 +439,10 @@ class redis_controller:
 
     ########################################About Groups###############################################
     def listGroups(self):
-        return group.get_all(self.redis_db)
+        return group.getAll(self.redis_db)
     
     def addGroup(self, groupName):
-        group.add(groupName, self.redis_db)
+        return group.add(groupName, self.redis_db)
 
     # def addDeviceToGroup(self, deviceName, groupName):
     #     groupId = self.findGroup(groupName).groupId
@@ -324,9 +456,9 @@ class redis_controller:
     #     db.session.delete(groupDevice.query.filter_by(groupId = groupId, deviceId=deviceId).first())
     #     db.session.commit()
 
-    def findGroup(self, groupName):
-        result = group.getIdByName(groupName, self.redis_db)
-        return result
+    # def findGroup(self, groupName):
+    #     result = group.getIdByName(groupName, self.redis_db)
+    #     return result
     
     # def delGroup(self, groupName):
     #     db.session.delete(self.findGroup(groupName))
@@ -335,37 +467,46 @@ class redis_controller:
 
     ########################################About Units###############################################
     def listUnits(self, groupId):
-        result = unit.get_all(groupId, self.redis_db)
+        result = unit.getAll(groupId, self.redis_db)
         return result
     
     def addUnit(self, groupName, unitName, bandwidthLimit):
         groupId = group.getIdByName(groupName, self.redis_db)
         if groupId is None:
-            raise ValueError
+            prink('group:' + groupName + ' does not exist.')
+            return ("Bad request", 400)
         else:
-            unit.add(unitName, groupId, bandwidthLimit, self.redis_db)
+            return unit.add(unitName, groupId, bandwidthLimit, self.redis_db)
 
     def findUnit(self, unitName):
         unitId = unit.getIdByName(unitName, self.redis_db)
         return unitId
 
-    # def joinUnit(self, unitName, deviceName):
-    #     unitId = self.findUnit(unitName).unitId
-    #     deviceId = self.findDevice(deviceName).deviceId
-    #     db.session.add(membership(unitId, deviceId));
-    #     db.session.commit()
+    def joinUnit(self, unitName, deviceName):
+        unitId = unit.getIdByName(unitName, self.redis_db)
+        deviceId = device.getIdByName(deviceName, self.redis_db)
+        membership.add(unitId, deviceId, self.redis_db)
 
-    # def leaveUnit(self, unitName, deviceName):
-    #     unitId = self.findUnit(unitName).unitId
-    #     deviceId = self.findDevice(deviceName).deviceId
-    #     db.session.delete(membership.query.filter_by(unitId = unitId, deviceId = deviceId).first())
-    #     db.session.commit()
+    def leaveUnit(self, unitName, deviceName):
+        unitId = unit.getIdByName(unitName, self.redis_db)
+        deviceId = device.getIdByName(deviceName, self.redis_db)
+        if unitId is None:
+            prink('unit:' + unitName + ' does not exist.')
+            return ('Object not founds', 400)
+        if deviceId is None:
+            prink('device:' + deviceName + ' does not exist.')
+            return ('Object not founds', 400)
+        return membership.delete(unitId, deviceId, self.redis_db)
 
-    
+    def delUnit(self, unitName):
+        return unit.delete(unitName, self.redis_db)
 
     ########################################About Devices###############################################
-    def addDevice(self, deviceName, secret, ip, timestamp):
-        device.add(deviceName, secret, ip, timestamp, self.redis_db)
+    def addDevice(self, deviceName, secret, ip, txbitrate, rssi, ssid, bssid, status, timestamp):
+        return device.add(deviceName, secret, ip, txbitrate, rssi, ssid, bssid, status, timestamp, self.redis_db)
+    
+    def delDevice(self, deviceName):
+        return device.delete(deviceName, self.redis_db)
 
     # def addDeviceToGroup(self, deviceName, groupName):
     #     groupId = self.findGroup(groupName).groupId
@@ -387,14 +528,8 @@ class redis_controller:
 
     # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     def listDevices(self, unitId):
-        # result= membership.query.filter_by(unitId = uid)
-        # return result
-        return self.listAllDevices()
+        return membership.getDevicesByUnitId(unitId, self.redis_db)
 
     def listAllDevices(self):
-        result = device.get_all(self.redis_db)
-        return result
+        return device.getAll(self.redis_db)
     
-    # def delDevice(self, deviceName):
-    #     db.session.delete(self.findDevice(deviceName))
-    #     db.session.commit()

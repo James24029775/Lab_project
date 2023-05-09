@@ -38,8 +38,8 @@ class UnitOverview extends Component {
   async openAddDevice(id) {
     OnlineApiHelper.fetchOnlineDevice().then();
     OnlineApiHelper.fetchOnlineUnit().then();
-    ApiHelper.fetchRegisteredDevices().then();
-    ApiHelper.fetchRegisteredUnits().then();
+    // ApiHelper.fetchRegisteredDevices().then();
+    // ApiHelper.fetchRegisteredUnits().then();
 
     // console.log("this.props.devices", this.props.devices);
 
