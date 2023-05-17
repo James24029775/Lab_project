@@ -36,6 +36,9 @@ class UnitOverview extends Component {
    * @param plmn          {number}
    */
   async openAddDevice(id) {
+    // ! 不知為何selected的進度總是怪怪的!!!!!!!!!!!!!!!!!!!!!!!!!!
+    console.log("ATTENTION FREsH", this.state.selected)
+
     OnlineApiHelper.fetchOnlineDevice().then();
     OnlineApiHelper.fetchOnlineUnit().then();
     // ApiHelper.fetchRegisteredDevices().then();
@@ -70,6 +73,9 @@ class UnitOverview extends Component {
       unselectable: unselectable,
       selected: selected,
     });
+    // ! 不知為何selected的進度總是怪怪的!!!!!!!!!!!!!!!!!!!!!!!!!!
+    console.log("ATTENTION******", this.state.selected)
+
   }
 
   async addDevice(selectMap) {
@@ -105,6 +111,7 @@ class UnitOverview extends Component {
         ApiHelper.deleteDeviceFromUnit(key, unitName)
       }
     }
+
     // const result = await ApiHelper.updateSubscriber(subscriberData);
 
     // if (!result) {
@@ -112,7 +119,6 @@ class UnitOverview extends Component {
     // }
     // ApiHelper.fetchSubscribers().then();
     OnlineApiHelper.fetchOnlineUnit().then();
-    
   }
 
   async addUnit(unitData) {
