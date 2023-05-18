@@ -15,6 +15,7 @@ if (process.env.NODE_ENV === 'test') {
   config.API_URL = process.env.REACT_APP_HTTP_API_URL ? process.env.REACT_APP_HTTP_API_URL : "/api";
 }
 
-config.API_URL = "http://127.0.0.1:8080"
+config.API_URL = "http://0.0.0.0:8080"
+// config.API_URL = "http://127.0.0.1:8080"
 // config.API_URL = "http://127.0.0.1:443"
 export default config;
