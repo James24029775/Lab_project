@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+    flask:
+        container_name: sdn-flask
+        build: ./api/docker-images/flask
+        restart: always
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./api/backend:/opt/app/
+        # networks:
+        #     docker:
+        #         ipv4_address: 172.19.1.2
+        # depends_on:
+        #     - sdn-redis
+
+    webui:
+        container_name: sdn-webui
+        build: ./webui
+        restart: always
+        ports:
+            - "5000:5000"
+        volumes:
+            - ./webui:/webui/
+
+# networks:
+#     docker:
+#         ipam:
+#             config:
+#                 - subnet: 172.19.1.0/24
