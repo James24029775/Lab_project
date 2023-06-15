@@ -33,7 +33,7 @@ spec:
   - port: 8888
     protocol: TCP
     targetPort: 8888
-    nodePort: 2048
+    nodePort: 31726
     name: webui-service
   selector:
     app: webui
