@@ -16,10 +16,6 @@ spec:
       - name: webui
         image: localhost:5000/webui:1.0
         imagePullPolicy: Always
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
         ports:
         - containerPort: 8888
 
