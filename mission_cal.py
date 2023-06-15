@@ -23,7 +23,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         # 從header讀取body長度並抽出資料
         content_len = int(self.headers.get('content-length'))
         post_body = self.rfile.read(content_len)
-        # print(post_body)
+        print(post_body)
 
         # 以JSON解析資料
         data = json.loads(post_body)

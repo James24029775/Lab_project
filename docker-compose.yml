@@ -3,12 +3,12 @@ version: '3.5'
 services:
     flask:
         container_name: sdn-flask
-        build: ./api/docker-images/flask
+        build: ./api_install/docker/api/docker-images/flask
         restart: always
         ports:
             - "8080:8080"
         volumes:
-            - ./api/backend:/opt/app/
+            - ./api_install/docker/api/backend:/opt/app/
         # networks:
         #     docker:
         #         ipv4_address: 172.19.1.2
@@ -17,12 +17,12 @@ services:
 
     webui:
         container_name: sdn-webui
-        build: ./webui
+        build: ./webui_install/docker/webui
         restart: always
         ports:
             - "5000:5000"
         volumes:
-            - ./webui:/webui/
+            - ./webui_install/docker/webui:/webui/
 
 # networks:
 #     docker:

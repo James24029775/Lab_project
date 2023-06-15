@@ -1,0 +1,9 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none",
+    "yaml.schemas": {
+        "kubernetes://schema/v1%40service": "file:///home/james/Lab_project/webui_install/deployment.yml"
+    }
+}

@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: flask
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: flask
@@ -14,9 +15,18 @@ spec:
       containers:
       - name: flask
         image: localhost:5000/flask:1.0
+        volumeMounts:
+        - name: flask-volume
+          mountPath: /opt/app/
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 8080
+      volumes:
+      - name: flask-volume
+        hostPath:
+          path: ./docker/api/backend
+          type: Directory
