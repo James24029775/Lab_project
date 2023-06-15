@@ -1,19 +1,19 @@
 version: '3.5'
 
 services:
-    # flask:
-    #     container_name: sdn-flask
-    #     build: ./api_install/docker/api/docker-images/flask
-    #     restart: always
-    #     ports:
-    #         - "8080:8080"
-    #     volumes:
-    #         - ./api_install/docker/api/backend:/opt/app/
-    #     # networks:
-    #     #     docker:
-    #     #         ipv4_address: 172.19.1.2
-    #     # depends_on:
-    #     #     - sdn-redis
+    flask:
+        container_name: sdn-flask
+        build: ./api_install/docker/api/docker-images/flask
+        restart: always
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./api_install/docker/api/backend:/opt/app/
+        # networks:
+        #     docker:
+        #         ipv4_address: 172.19.1.2
+        # depends_on:
+        #     - sdn-redis
 
     webui:
         container_name: sdn-webui
