@@ -3,7 +3,7 @@ ADD requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
 RUN apt update && apt install dnsutils  -y
 RUN mkdir /opt/log
-ADD ./api/backend /app
+ADD api/backend /app
 
 ENV FLASK_APP=/app/main.py
 ENV FLASK_ENV=development

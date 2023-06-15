@@ -15,9 +15,6 @@ spec:
       containers:
       - name: flask
         image: localhost:5000/flask:1.0
-        # volumeMounts:
-        # - name: flask-volume
-        #   mountPath: /opt/app/
         imagePullPolicy: Always
         resources:
           limits:
@@ -25,8 +22,17 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 8080
-      # volumes:
-      # - name: flask-volume
-      #   hostPath:
-      #     path: ./docker/api/backend
-      #     type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    name: flask
+  selector:
+    app: flask
